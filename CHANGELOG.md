@@ -14,6 +14,7 @@
 - Delete note option to note menu.
 - Search, last modified date and open indicator to notes list.
 - Note created and modified times.
+- Delete confirmation dialog with "Don't ask me again", and setting to turn it back on.
 
 ### Changed
 - Spell checking now done directly with Windows vastly improving performance.

@@ -22,6 +22,7 @@ namespace PinnyNotes.WpfUi.Views;
 
 public partial class NoteWindow : Window
 {
+    private readonly SettingsService _settingsService;
     private readonly NoteSettingsModel _noteSettings;
     private readonly MessengerService _messengerService;
     private readonly ThemeService _themeService;
@@ -32,6 +33,7 @@ public partial class NoteWindow : Window
 
     public NoteWindow(SettingsService settingsService, MessengerService messengerService, ThemeService themeService, NoteViewModel viewModel)
     {
+        _settingsService = settingsService;
         _noteSettings = settingsService.NoteSettings;
         _messengerService = messengerService;
         _messengerService.Subscribe<WindowActionMessage>(OnWindowActionMessage);
@@ -277,14 +279,7 @@ public partial class NoteWindow : Window
 
     private async void DeleteMenuItem_Click(object sender, RoutedEventArgs e)
     {
-        MessageBoxResult result = MessageBox.Show(
-            this,
-            "Delete this note? This can't be undone.",
-            "Delete note",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Warning
-        );
-        if (result != MessageBoxResult.Yes)
+        if (!await ConfirmDeleteWindow.Confirm(this, _settingsService))
             return;
 
         await _viewModel.DeleteNote();

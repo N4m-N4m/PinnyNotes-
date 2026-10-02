@@ -12,6 +12,7 @@ using PinnyNotes.WpfUi.Messages;
 using PinnyNotes.WpfUi.Models;
 using PinnyNotes.WpfUi.Services;
 using PinnyNotes.WpfUi.Themes;
+using PinnyNotes.WpfUi.Views;
 
 namespace PinnyNotes.WpfUi.ViewModels;
 
@@ -202,11 +203,8 @@ public class ManagementViewModel : BaseViewModel, INotifyPropertyChanged
 
     private async void DeleteNotes(List<int> noteIds)
     {
-        string prompt = (noteIds.Count == 1)
-            ? "Delete this note? This can't be undone."
-            : $"Delete {noteIds.Count} notes? This can't be undone.";
-        MessageBoxResult result = MessageBox.Show(prompt, "Delete note", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-        if (result != MessageBoxResult.Yes)
+        Window? owner = Application.Current.Windows.OfType<ManagementWindow>().FirstOrDefault();
+        if (!await ConfirmDeleteWindow.Confirm(owner, SettingsService, noteIds.Count))
             return;
 
         CloseNotes(noteIds);
