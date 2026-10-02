@@ -22,6 +22,9 @@ public class NoteViewModel : BaseViewModel
 
     private readonly DispatcherTimer _saveTimer;
 
+    private string _lastSavedContent = "";
+    private bool _isDeleted;
+
     public NoteViewModel(
         NoteRepository noteRepository,
         AppMetadataService appMetadataService,
@@ -104,8 +107,15 @@ public class NoteViewModel : BaseViewModel
 
     public async Task SaveNote()
     {
-        if (Note.IsSaved)
+        if (Note.IsSaved || _isDeleted)
             return;
+
+        // Only content edits count as a modification, moving or resizing does not.
+        if (Note.Content != _lastSavedContent)
+        {
+            Note.ModifiedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            _lastSavedContent = Note.Content;
+        }
 
         await _noteRepository.Update(
             Note.ToDto()
@@ -119,6 +129,9 @@ public class NoteViewModel : BaseViewModel
     public async Task<bool> CloseNote()
     {
         _saveTimer.Stop();
+
+        if (_isDeleted)
+            return false;
 
         MessengerService.Publish<NoteActionMessage>(new(NoteAction.Closed, Note.ToDto()));
 
@@ -135,6 +148,18 @@ public class NoteViewModel : BaseViewModel
         await SaveNote();
 
         return false;
+    }
+
+    public async Task DeleteNote()
+    {
+        _saveTimer.Stop();
+        _isDeleted = true;
+        Note.IsOpen = false;
+
+        await _noteRepository.Delete(Note.Id);
+
+        MessengerService.Publish<NoteActionMessage>(new(NoteAction.Closed, Note.ToDto()));
+        MessengerService.Publish<NoteActionMessage>(new(NoteAction.Deleted, Note.ToDto()));
     }
 
     private async Task CreateNewNote(NoteModel? parent = null, nint? managementWindowHandle = null)
@@ -157,6 +182,7 @@ public class NoteViewModel : BaseViewModel
     private async Task LoadNote(int noteId)
     {
         Note = new(await _noteRepository.GetById((int)noteId), NoteSettings);
+        _lastSavedContent = Note.Content;
 
         UpdateBrushes();
         UpdateOpacity();

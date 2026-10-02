@@ -6,105 +6,247 @@
         xmlns:local="clr-namespace:PinnyNotes.WpfUi.Views"
         xmlns:vm="clr-namespace:PinnyNotes.WpfUi.ViewModels"
         mc:Ignorable="d"
-        Title="Pinny Notes"
-        Width="600"
-        Height="400"
+        Title="Notes"
+        Width="380"
+        Height="560"
+        MinWidth="300"
+        MinHeight="300"
 
         d:DataContext="{d:DesignInstance Type=vm:ManagementViewModel}">
 
-    <Grid>
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+
+        <!-- Small icon button used on note cards, coloured to match the note -->
+        <Style x:Key="CardButtonStyle" TargetType="Button" BasedOn="{StaticResource IconButtonStyle}">
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{Binding TextBrush}"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="16,12,16,0">
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <ToolBar Grid.Row="0" ToolBarTray.IsLocked="True">
-            <ToolBar.Resources>
-                <Style x:Key="ToolBarButtonStyle" TargetType="Button">
-                    <Setter Property="Width" Value="32"/>
-                    <Setter Property="Height" Value="32"/>
-                    <Setter Property="Padding" Value="0"/>
-                    <Setter Property="Focusable" Value="False"/>
-                    <Setter Property="Background" Value="Transparent"/>
-                    <Setter Property="Opacity" Value="0.6"/>
-                    <Style.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Opacity" Value="1.0"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </ToolBar.Resources>
+        <!-- Header -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0"
+                       Text="Notes"
+                       VerticalAlignment="Center"
+                       FontFamily="Segoe UI Variable Display, Segoe UI"
+                       FontSize="20"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
 
             <Button x:Name="NewNoteButton"
+                    Grid.Column="1"
+                    Width="32"
+                    Height="32"
+                    FontSize="16"
                     ToolTip="New note"
                     Command="{Binding NewNoteCommand}"
-                    Style="{StaticResource ToolBarButtonStyle}">
-                <Button.Template>
-                    <ControlTemplate>
-                        <Canvas>
-                            <Rectangle Width="32" Height="32" Fill="Transparent" />
-                            <Path Data="M 4,4 v 24 h 24 V 4 Z M 4, 10 h 24"
-                                  Stroke="{DynamicResource TextFillColorSecondaryBrush}"
-                                  StrokeThickness="2"
-                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                                  d:Stroke="#464646">
-                            </Path>
-                        </Canvas>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    Style="{StaticResource IconButtonStyle}"
+                    Content="&#xE710;" />
 
             <Button x:Name="SettingsButton"
+                    Grid.Column="2"
+                    Width="32"
+                    Height="32"
+                    FontSize="16"
                     ToolTip="Settings"
                     Command="{Binding OpenSettingsCommand}"
-                    Style="{StaticResource ToolBarButtonStyle}">
-                <Button.Template>
-                    <ControlTemplate>
-                        <Canvas>
-                            <Rectangle Width="32" Height="32" Fill="Transparent" />
-                            <Path Data="M 4,8 h 24 M 8, 4 V 12 M 4,16 h 24 M 24, 12 V 20 M 4,24 h 24 M 16, 20 V 28"
-                                  Stroke="{DynamicResource TextFillColorSecondaryBrush}"
-                                  StrokeThickness="2"
-                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                                  d:Stroke="#464646">
-                            </Path>
-                        </Canvas>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    Style="{StaticResource IconButtonStyle}"
+                    Content="&#xE713;" />
+        </Grid>
 
-        </ToolBar>
+        <!-- Search -->
+        <Grid Grid.Row="1" Margin="0,12,0,12">
+            <TextBox x:Name="SearchTextBox"
+                     Padding="34,6,8,6"
+                     VerticalContentAlignment="Center"
+                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
 
+            <TextBlock Text="&#xE721;"
+                       Margin="12,0,0,0"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Left"
+                       IsHitTestVisible="False"
+                       FontFamily="{StaticResource IconFontFamily}"
+                       FontSize="14"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+            <TextBlock Text="Search…"
+                       Margin="36,0,0,0"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Left"
+                       IsHitTestVisible="False"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Text, ElementName=SearchTextBox}" Value="">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </Grid>
+
+        <!-- Notes -->
         <ListView x:Name="NotesListView"
-                  Grid.Row="1"
-                  Margin="5,5,5,5"
+                  Grid.Row="2"
+                  Padding="0"
+                  Background="Transparent"
+                  BorderThickness="0"
+                  HorizontalContentAlignment="Stretch"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  VirtualizingPanel.ScrollUnit="Pixel"
                   SelectionMode="Extended"
-                  ItemsSource="{Binding NotePreviews}">
+                  ItemsSource="{Binding NotePreviewsView}">
 
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Border Width="125"
-                            Height="125"
-                            Margin="5"
-                            Padding="0,20,0,0"
-                            Background="{Binding TitleBrush}"
+                    <!-- Outer border draws the coloured strip along the top of the card -->
+                    <Border CornerRadius="8"
+                            Padding="0,4,0,0"
+                            Background="{Binding BorderBrush}"
                             BorderBrush="{Binding BorderBrush}"
                             BorderThickness="1">
-                        <TextBlock Text="{Binding ContentPreview}"
-                                   FontSize="12"
-                                   TextWrapping="Wrap"
-                                   Padding="5,2,5,2"
-                                   Background="{Binding BackgroundBrush}"
-                                   Foreground="{Binding TextBrush}" />
+                        <Border CornerRadius="0,0,7,7"
+                                Background="{Binding BackgroundBrush}">
+                            <Grid Margin="12,6,6,12">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+
+                                <!-- Meta row -->
+                                <Grid Grid.Row="0" Height="24">
+                                    <Ellipse Width="7"
+                                             Height="7"
+                                             HorizontalAlignment="Left"
+                                             VerticalAlignment="Center"
+                                             Fill="{Binding TextBrush}"
+                                             Opacity="0.55"
+                                             ToolTip="Open"
+                                             Visibility="{Binding IsOpen, Converter={StaticResource BoolToVisibility}}" />
+
+                                    <TextBlock x:Name="ModifiedTextBlock"
+                                               Text="{Binding ModifiedDisplay}"
+                                               Margin="0,0,6,0"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center"
+                                               FontSize="12"
+                                               Opacity="0.65"
+                                               Foreground="{Binding TextBrush}" />
+
+                                    <StackPanel x:Name="CardActions"
+                                                HorizontalAlignment="Right"
+                                                Orientation="Horizontal"
+                                                Visibility="Collapsed">
+                                        <Button ToolTip="Open note"
+                                                Content="&#xE8A7;"
+                                                Command="{Binding DataContext.OpenNoteCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                CommandParameter="{Binding Id}">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource CardButtonStyle}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsOpen}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Button ToolTip="Close note"
+                                                Content="&#xE711;"
+                                                Command="{Binding DataContext.CloseNoteCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                CommandParameter="{Binding Id}">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource CardButtonStyle}">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsOpen}" Value="False">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Button ToolTip="Delete note"
+                                                Content="&#xE74D;"
+                                                Style="{StaticResource CardButtonStyle}"
+                                                Command="{Binding DataContext.DeleteNoteCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                CommandParameter="{Binding Id}" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Preview text, up to 4 lines -->
+                                <TextBlock Grid.Row="1"
+                                           Margin="0,2,6,0"
+                                           Text="{Binding ContentPreview}"
+                                           FontSize="14"
+                                           LineHeight="20"
+                                           LineStackingStrategy="BlockLineHeight"
+                                           MaxHeight="80"
+                                           TextWrapping="Wrap"
+                                           TextTrimming="CharacterEllipsis"
+                                           Foreground="{Binding TextBrush}" />
+                            </Grid>
+                        </Border>
                     </Border>
+
+                    <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListViewItem}}" Value="True">
+                            <Setter TargetName="CardActions" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="ModifiedTextBlock" Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </DataTemplate.Triggers>
                 </DataTemplate>
             </ListView.ItemTemplate>
-            
+
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="IsSelected"
                             Value="{Binding IsSelected, Mode=TwoWay}" />
+                    <Setter Property="Margin" Value="0,0,0,8" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListViewItem">
+                                <Grid Background="Transparent">
+                                    <ContentPresenter />
+                                    <Border x:Name="SelectionBorder"
+                                            CornerRadius="8"
+                                            BorderThickness="2"
+                                            BorderBrush="{DynamicResource AccentFillColorDefaultBrush}"
+                                            IsHitTestVisible="False"
+                                            Visibility="Collapsed" />
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="SelectionBorder" Property="Visibility" Value="Visible" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
                 </Style>
             </ListView.ItemContainerStyle>
 
@@ -119,18 +261,33 @@
                     <MenuItem Header="Close note(s)"
                               Command="{Binding CloseNotesCommand}" />
                     <Separator />
-                    <MenuItem Header="Delete note"
+                    <MenuItem Header="Delete note(s)"
                               Command="{Binding DeleteNotesCommand}" />
                 </ContextMenu>
             </ListView.ContextMenu>
 
-            <ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel />
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
-
         </ListView>
+
+        <!-- Empty state -->
+        <TextBlock Grid.Row="2"
+                   Margin="0,40,0,0"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Top"
+                   TextAlignment="Center"
+                   IsHitTestVisible="False"
+                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                   Text="No notes to show">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding HasItems, ElementName=NotesListView}" Value="False">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
 
     </Grid>
 

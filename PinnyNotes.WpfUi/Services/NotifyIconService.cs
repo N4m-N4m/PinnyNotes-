@@ -77,7 +77,7 @@ public class NotifyIconService : IDisposable
 
         MenuItem managementWindowItem = new()
         {
-            Header = "Management Window"
+            Header = "Notes List"
         };
         managementWindowItem.Click += ManagementWindow_Click;
 

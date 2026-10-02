@@ -1,4 +1,4 @@
-﻿<Window x:Class="PinnyNotes.WpfUi.Views.NoteWindow"
+<Window x:Class="PinnyNotes.WpfUi.Views.NoteWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -8,7 +8,7 @@
         xmlns:controls="clr-namespace:PinnyNotes.WpfUi.Controls"
         mc:Ignorable="d"
 
-        BorderThickness="1"
+        BorderThickness="0"
         Icon="/Images/icon.ico"
         MinHeight="75"
         MinWidth="150"
@@ -24,15 +24,12 @@
         AllowsTransparency="{Binding Note.TransparencyEnabled}"
         Opacity="{Binding Note.Opacity}"
         ShowInTaskbar="{Binding Note.ShowInTaskbar}"
-        Background="{Binding Note.Background}"
-        BorderBrush="{Binding Note.BorderBrush}"
         Topmost="{Binding Note.IsPinned}"
 
         d:DataContext="{d:DesignInstance Type=vm:NoteViewModel}"
         d:Height="300"
         d:Width="300"
-        d:Background="#fffcdd"
-        d:BorderBrush="#feea00">
+        d:Background="#fffcdd">
 
     <shell:WindowChrome.WindowChrome>
         <shell:WindowChrome
@@ -43,182 +40,163 @@
             ResizeBorderThickness="5"/>
     </shell:WindowChrome.WindowChrome>
 
-    <Window.Resources>
-        <!-- Title Bar Buttons -->
-        <Style x:Key="TitleBarButtonStyle" TargetType="Control">
-            <Setter Property="Width" Value="20"/>
-            <Setter Property="Height" Value="20"/>
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="Focusable" Value="False"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Opacity" Value="0.6"/>
+    <Window.Style>
+        <Style TargetType="Window">
+            <!-- Opaque windows get rounded by DWM, transparent (layered) windows rely on RootBorder's corners -->
+            <Setter Property="Background" Value="{Binding Note.Background}"/>
             <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Opacity" Value="1.0"/>
-                </Trigger>
+                <DataTrigger Binding="{Binding Note.TransparencyEnabled}" Value="True">
+                    <Setter Property="Background" Value="Transparent"/>
+                </DataTrigger>
             </Style.Triggers>
         </Style>
+    </Window.Style>
 
+    <Window.Resources>
         <!-- Show/Hide Title Bar -->
         <Storyboard x:Key="HideTitleBarAnimation">
             <DoubleAnimation Storyboard.TargetName="TitleBarGrid"
-                             Storyboard.TargetProperty="Height" 
+                             Storyboard.TargetProperty="Height"
                              To="0" Duration="0:0:0.2" />
         </Storyboard>
         <Storyboard x:Key="ShowTitleBarAnimation">
             <DoubleAnimation Storyboard.TargetName="TitleBarGrid"
-                             Storyboard.TargetProperty="Height" 
-                             To="40" Duration="0:0:0.2" />
+                             Storyboard.TargetProperty="Height"
+                             To="32" Duration="0:0:0.2" />
         </Storyboard>
     </Window.Resources>
 
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <Border Name="RootBorder"
+            CornerRadius="8"
+            BorderThickness="1"
+            Background="{Binding Note.Background}"
+            BorderBrush="{Binding Note.BorderBrush}"
+            d:Background="#fffcdd"
+            d:BorderBrush="#feea00">
 
-        <!-- Title Bar -->
-        <Grid Name="TitleBarGrid"
-              Grid.Column="0"
-              Grid.Row="0"
-              Height="40"
-              Background="{Binding Note.TitleGridBackground}"
-              d:Background="#fef7b1">
+        <Grid Name="ContentGrid">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-            <!-- New Note Button -->
-            <Button Name="NewButton"
-                    HorizontalAlignment="Left"
-                    Margin="10,0,0,0"
-                    ToolTip="New Note"
-                    Style="{StaticResource TitleBarButtonStyle}">
-                <Button.Template>
-                    <ControlTemplate>
-                        <Canvas>
-                            <Rectangle Width="20" Height="20" Fill="Transparent" />
-                            <Path Data="M 10,2 v 16 M 2,10 h 16"
-                                  Stroke="{Binding Note.TitleGridButtonForeground}"
-                                  StrokeThickness="3"
-                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                                  d:Stroke="#464646">
-                            </Path>
-                        </Canvas>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
+            <!-- Title Bar -->
+            <Grid Name="TitleBarGrid"
+                  Grid.Row="0"
+                  Height="32"
+                  Background="{Binding Note.TitleGridBackground}"
+                  d:Background="#fef7b1">
 
-            <!-- Pin Button -->
-            <ToggleButton Name="PinButton"
-                          HorizontalAlignment="Center"
-                          ToolTip="Toggle On Top"
-                          Style="{StaticResource TitleBarButtonStyle}"
-                          IsChecked="{Binding Note.IsPinned}">
-                <ToggleButton.Template>
-                    <ControlTemplate TargetType="ToggleButton">
-                        <Canvas>
-                            <Rectangle Width="20" Height="20" Fill="Transparent" />
-                            <Path Data="M 5,0 h 10 c 1,0 1,2 0,2 h -2 l 1,6 c 0,0 4,1 4,5 0,1 -7,1 -7,1 0,0 0,6 -1,6 C 9,20 9,14 9,14 9,14 2,14 2,13 2,9 6,8 6,8 L 7,2 H 5 C 4,2 4,0 5,0 Z"
-                                  Fill="{Binding Note.TitleGridButtonForeground}"
-                                  RenderTransformOrigin="0.5,0.5"
-                                  d:Fill="#464646">
-                                <Path.Style>
-                                    <Style TargetType="Path">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton}, Path=IsChecked}" Value="False">
-                                                <Setter Property="RenderTransform">
-                                                    <Setter.Value>
-                                                        <RotateTransform Angle="45"/>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Path.Style>
-                            </Path>
-                        </Canvas>
-                    </ControlTemplate>
-                </ToggleButton.Template>
-            </ToggleButton>
+                <!-- New Note Button -->
+                <Button Name="NewButton"
+                        HorizontalAlignment="Left"
+                        Margin="4,0,0,0"
+                        ToolTip="New note"
+                        Foreground="{Binding Note.TitleGridButtonForeground}"
+                        Style="{StaticResource IconButtonStyle}"
+                        Content="&#xE710;" />
 
-            <!-- Close Button -->
-            <Button Name="CloseButton"
-                    HorizontalAlignment="Right"
-                    Margin="0,0,10,0"
-                    ToolTip="Close"
-                    Style="{StaticResource TitleBarButtonStyle}">
-                <Button.Template>
-                    <ControlTemplate>
-                        <Canvas>
-                            <Rectangle Width="20" Height="20" Fill="Transparent" />
-                            <Path Data="M 3,3 L 17,17 M 3,17 L 17,3"
-                                  Stroke="{Binding Note.TitleGridButtonForeground}"
-                                  StrokeThickness="3"
-                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                                  d:Stroke="#464646">
-                            </Path>
-                        </Canvas>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
+                <!-- Pin Button -->
+                <ToggleButton Name="PinButton"
+                              HorizontalAlignment="Center"
+                              ToolTip="Keep on top"
+                              Foreground="{Binding Note.TitleGridButtonForeground}"
+                              IsChecked="{Binding Note.IsPinned}">
+                    <ToggleButton.Style>
+                        <Style TargetType="ToggleButton" BasedOn="{StaticResource IconToggleButtonStyle}">
+                            <Setter Property="Content" Value="&#xE718;"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter Property="Content" Value="&#xE842;"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ToggleButton.Style>
+                </ToggleButton>
 
-            <!-- Context Menu -->
-            <Grid.ContextMenu>
-                <ContextMenu Name="TitleBarContextMenu">
-                    <MenuItem Header="Save" Click="SaveMenuItem_Click" />
-                    <Separator />
-                    <MenuItem Header="Reset size" Click="ResetMenuItem_Click" />
-                    <Separator />
-                    <!-- Theme options are added dynamically in code behind -->
-                    <Separator Name="ThemeMenuSeparator" />
-                    <MenuItem Header="Management" Click="ManagementMenuItem_Click" />
-                    <MenuItem Header="Settings" Click="SettingsMenuItem_Click" />
-                </ContextMenu>
-            </Grid.ContextMenu>
+                <StackPanel HorizontalAlignment="Right"
+                            Margin="0,0,4,0"
+                            Orientation="Horizontal">
 
+                    <!-- Notes List Button -->
+                    <Button Name="NotesListButton"
+                            ToolTip="Notes list"
+                            Foreground="{Binding Note.TitleGridButtonForeground}"
+                            Style="{StaticResource IconButtonStyle}"
+                            Content="&#xE8FD;" />
+
+                    <!-- More Button -->
+                    <Button Name="MoreButton"
+                            ToolTip="Menu"
+                            Foreground="{Binding Note.TitleGridButtonForeground}"
+                            Style="{StaticResource IconButtonStyle}"
+                            Content="&#xE712;" />
+
+                    <!-- Close Button -->
+                    <Button Name="CloseButton"
+                            ToolTip="Close"
+                            Foreground="{Binding Note.TitleGridButtonForeground}"
+                            Style="{StaticResource IconButtonStyle}"
+                            Content="&#xE711;" />
+                </StackPanel>
+
+                <!-- Context Menu -->
+                <Grid.ContextMenu>
+                    <ContextMenu Name="TitleBarContextMenu">
+                        <MenuItem Header="Export as .txt…" Click="SaveMenuItem_Click" />
+                        <MenuItem Header="Reset size" Click="ResetMenuItem_Click" />
+                        <Separator />
+                        <!-- Theme options are added dynamically in code behind -->
+                        <Separator Name="ThemeMenuSeparator" />
+                        <MenuItem Header="Notes list" Click="ManagementMenuItem_Click" />
+                        <MenuItem Header="Settings" Click="SettingsMenuItem_Click" />
+                        <Separator />
+                        <MenuItem Header="Delete note" Click="DeleteMenuItem_Click" />
+                    </ContextMenu>
+                </Grid.ContextMenu>
+
+            </Grid>
+
+            <!-- Text Box -->
+            <Grid Grid.Row="1">
+                <controls:NoteTextBoxControl BorderThickness="0"
+                                             Background="Transparent"
+                                             Foreground="{Binding Note.ContentTextBoxForeground}"
+                                             CaretBrush="{Binding Foreground, RelativeSource={RelativeSource Self}}"
+                                             FontSize="16"
+                                             x:Name="NoteTextBox"
+                                             Padding="10,8,10,8"
+                                             Text="{Binding Note.Content, UpdateSourceTrigger=PropertyChanged}"
+
+                                             BackgroundSpellCheck="{Binding EditorSettings.CheckSpelling}"
+                                             NewLineAtEnd="{Binding EditorSettings.NewLineAtEnd}"
+                                             KeepNewLineAtEndVisible="{Binding EditorSettings.KeepNewLineVisible}"
+                                             WrapText="{Binding EditorSettings.WrapText}"
+
+                                             StandardFontFamily="{Binding EditorSettings.StandardFontFamily}"
+                                             MonoFontFamily="{Binding EditorSettings.MonoFontFamily}"
+                                             UseMonoFont="{Binding EditorSettings.UseMonoFont}"
+
+                                             AutoIndent="{Binding EditorSettings.AutoIndent}"
+                                             TabSpaces="{Binding EditorSettings.UseSpacesForTab}"
+                                             ConvertIndentation="{Binding EditorSettings.ConvertIndentationOnPaste}"
+                                             TabWidth="{Binding EditorSettings.TabSpacesWidth}"
+
+                                             CopyAction="{Binding EditorSettings.CopyAction}"
+                                             TrimTextOnCopy="{Binding EditorSettings.TrimTextOnCopy}"
+                                             CopyAltAction="{Binding EditorSettings.CopyAltAction}"
+                                             TrimTextOnAltCopy="{Binding EditorSettings.TrimTextOnAltCopy}"
+                                             CopyFallbackAction="{Binding EditorSettings.CopyFallbackAction}"
+                                             TrimTextOnFallbackCopy="{Binding EditorSettings.TrimTextOnFallbackCopy}"
+                                             CopyAltFallbackAction="{Binding EditorSettings.CopyAltFallbackAction}"
+                                             TrimTextOnAltFallbackCopy="{Binding EditorSettings.TrimTextOnAltFallbackCopy}"
+                                             AutoCopy="{Binding EditorSettings.CopyOnSelect}"
+                                             PasteAction="{Binding EditorSettings.PasteAction}"
+                                             TrimTextOnPaste="{Binding EditorSettings.TrimTextOnPaste}"
+                                             PasteAltAction="{Binding EditorSettings.PasteAltAction}"
+                                             TrimTextOnAltPaste="{Binding EditorSettings.TrimTextOnAltPaste}"
+                                             MiddleClickPaste="{Binding EditorSettings.MiddleClickPaste}" />
+            </Grid>
         </Grid>
-
-        <!-- Text Box -->
-        <Grid Grid.Column="0" Grid.Row="1">
-            <controls:NoteTextBoxControl BorderThickness="0"
-                                         Background="Transparent"
-                                         Foreground="{Binding Note.ContentTextBoxForeground}"
-                                         CaretBrush="{Binding Foreground, RelativeSource={RelativeSource Self}}"
-                                         FontSize="16"
-                                         x:Name="NoteTextBox"
-                                         Padding="5,5,5,5"
-                                         Text="{Binding Note.Content, UpdateSourceTrigger=PropertyChanged}"
-
-                                         BackgroundSpellCheck="{Binding EditorSettings.CheckSpelling}"
-                                         NewLineAtEnd="{Binding EditorSettings.NewLineAtEnd}"
-                                         KeepNewLineAtEndVisible="{Binding EditorSettings.KeepNewLineVisible}"
-                                         WrapText="{Binding EditorSettings.WrapText}"
-
-                                         StandardFontFamily="{Binding EditorSettings.StandardFontFamily}"
-                                         MonoFontFamily="{Binding EditorSettings.MonoFontFamily}"
-                                         UseMonoFont="{Binding EditorSettings.UseMonoFont}"
-
-                                         AutoIndent="{Binding EditorSettings.AutoIndent}"
-                                         TabSpaces="{Binding EditorSettings.UseSpacesForTab}"
-                                         ConvertIndentation="{Binding EditorSettings.ConvertIndentationOnPaste}"
-                                         TabWidth="{Binding EditorSettings.TabSpacesWidth}"
-
-                                         CopyAction="{Binding EditorSettings.CopyAction}"
-                                         TrimTextOnCopy="{Binding EditorSettings.TrimTextOnCopy}"
-                                         CopyAltAction="{Binding EditorSettings.CopyAltAction}"
-                                         TrimTextOnAltCopy="{Binding EditorSettings.TrimTextOnAltCopy}"
-                                         CopyFallbackAction="{Binding EditorSettings.CopyFallbackAction}"
-                                         TrimTextOnFallbackCopy="{Binding EditorSettings.TrimTextOnFallbackCopy}"
-                                         CopyAltFallbackAction="{Binding EditorSettings.CopyAltFallbackAction}"
-                                         TrimTextOnAltFallbackCopy="{Binding EditorSettings.TrimTextOnAltFallbackCopy}"
-                                         AutoCopy="{Binding EditorSettings.CopyOnSelect}"
-                                         PasteAction="{Binding EditorSettings.PasteAction}"
-                                         TrimTextOnPaste="{Binding EditorSettings.TrimTextOnPaste}"
-                                         PasteAltAction="{Binding EditorSettings.PasteAltAction}"
-                                         TrimTextOnAltPaste="{Binding EditorSettings.TrimTextOnAltPaste}"
-                                         MiddleClickPaste="{Binding EditorSettings.MiddleClickPaste}" />
-        </Grid>
-    </Grid>
+    </Border>
 </Window>

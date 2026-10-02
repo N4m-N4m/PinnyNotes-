@@ -10,12 +10,20 @@
 - Startup and new instance behaviour settings.
 - Toolbar to management window.
 - Management menu into in note title bar context menu.
+- Notes list and menu buttons to note title bar.
+- Delete note option to note menu.
+- Search, last modified date and open indicator to notes list.
+- Note created and modified times.
 
 ### Changed
 - Spell checking now done directly with Windows vastly improving performance.
+- Modernised design, rounded note corners and Fluent icon buttons.
+- Management window redesigned as notes list.
+- Note "Save" menu item renamed to "Export as .txt…".
 
 ### Fixed
 - Notes staying on top of other windows when not pinned.
+- Notes closed from the management window re-opening on next start up.
 
 
 ## v1.16.0 - 23/02/2026

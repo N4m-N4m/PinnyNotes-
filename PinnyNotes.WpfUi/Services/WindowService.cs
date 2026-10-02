@@ -182,7 +182,7 @@ public class WindowService
     {
         if (_openNoteWindows.TryGetValue(noteId, out NoteWindow? window) && window.IsLoaded)
         {
-            window.Close();
+            window.CloseNote();
             _openNoteWindows.Remove(noteId);
         }
     }
@@ -192,7 +192,7 @@ public class WindowService
         if (_managementWindow is null || !_managementWindow.IsLoaded)
         {
             _managementWindow = _serviceProvider.GetRequiredService<ManagementWindow>();
-            _managementWindow.Closed += (s, e) => _settingsWindow = null;
+            _managementWindow.Closed += (s, e) => _managementWindow = null;
         }
 
         if (!_managementWindow.IsVisible)

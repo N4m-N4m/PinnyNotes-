@@ -18,6 +18,9 @@ public class NoteModel : BaseModel
 
         ThemeColourScheme = themeColourScheme;
 
+        CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        ModifiedAt = CreatedAt;
+
         TransparencyEnabled = (NoteSettings.TransparencyMode != TransparencyMode.Disabled);
     }
 
@@ -40,6 +43,9 @@ public class NoteModel : BaseModel
         IsPinned = noteDto.IsPinned;
         IsOpen = noteDto.IsOpen;
 
+        CreatedAt = noteDto.CreatedAt;
+        ModifiedAt = noteDto.ModifiedAt;
+
         TransparencyEnabled = (NoteSettings.TransparencyMode != TransparencyMode.Disabled);
     }
 
@@ -60,6 +66,9 @@ public class NoteModel : BaseModel
 
     public bool IsPinned { get; set => SetProperty(ref field, value); }
     public bool IsOpen { get; set => SetProperty(ref field, value); }
+
+    public long CreatedAt { get; set => SetProperty(ref field, value); }
+    public long ModifiedAt { get; set => SetProperty(ref field, value); }
 
 
     public nint WindowHandle { get; set; }
@@ -104,7 +113,10 @@ public class NoteModel : BaseModel
             ThemeColourScheme,
 
             IsPinned,
-            IsOpen
+            IsOpen,
+
+            CreatedAt,
+            ModifiedAt
         );
 
         return noteDto;

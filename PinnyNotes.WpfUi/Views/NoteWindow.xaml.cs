@@ -3,11 +3,15 @@ using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Interop;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 
 using PinnyNotes.Core.Enums;
 using PinnyNotes.WpfUi.Helpers;
+using PinnyNotes.WpfUi.Interop;
 using PinnyNotes.WpfUi.Messages;
 using PinnyNotes.WpfUi.Models;
 using PinnyNotes.WpfUi.Services;
@@ -39,8 +43,10 @@ public partial class NoteWindow : Window
 
         InitializeComponent();
 
+        SourceInitialized += Window_SourceInitialized;
         Activated += Window_Activated;
         Closing += Window_Closing;
+        Closed += Window_Closed;
         Deactivated += Window_Deactivated;
         MouseDown += NoteWindow_MouseDown;
         MouseEnter += Window_MouseEnter;
@@ -48,9 +54,14 @@ public partial class NoteWindow : Window
         Loaded += Window_Loaded;
         StateChanged += NoteWindow_StateChanged;
 
+        ContentGrid.SizeChanged += ContentGrid_SizeChanged;
+
         TitleBarGrid.MouseDown += TitleBar_MouseDown;
         NewButton.Click += NewButton_Click;
+        NotesListButton.Click += NotesListButton_Click;
+        MoreButton.Click += MoreButton_Click;
         CloseButton.Click += CloseButton_Click;
+        TitleBarContextMenu.Closed += TitleBarContextMenu_Closed;
 
         PopulateTitleBarContextMenu();
     }
@@ -72,6 +83,20 @@ public partial class NoteWindow : Window
 
             insertIndex++;
         }
+    }
+
+    private void Window_SourceInitialized(object? sender, EventArgs e)
+    {
+        // Layered (transparent) windows can't be rounded by DWM, RootBorder handles those.
+        if (!AllowsTransparency)
+            DwmApi.ApplyRoundedCorners(new WindowInteropHelper(this).Handle);
+    }
+
+    private void ContentGrid_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        // Clip content so the title bar and text box follow RootBorder's rounded corners.
+        double radius = Math.Max(0, RootBorder.CornerRadius.TopLeft - RootBorder.BorderThickness.Left);
+        ContentGrid.Clip = new RectangleGeometry(new Rect(e.NewSize), radius, radius);
     }
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -137,6 +162,11 @@ public partial class NoteWindow : Window
         e.Cancel = await _viewModel.CloseNote();
     }
 
+    private void Window_Closed(object? sender, EventArgs e)
+    {
+        _messengerService.Unsubscribe<WindowActionMessage>(OnWindowActionMessage);
+    }
+
     private void OnWindowActionMessage(WindowActionMessage message)
     {
         if (message.Action == WindowAction.Activate)
@@ -168,7 +198,32 @@ public partial class NoteWindow : Window
         );
     }
 
+    private void NotesListButton_Click(object sender, RoutedEventArgs e)
+    {
+        _messengerService.Publish(new OpenManagementWindowMessage());
+    }
+
+    private void MoreButton_Click(object sender, RoutedEventArgs e)
+    {
+        TitleBarContextMenu.PlacementTarget = MoreButton;
+        TitleBarContextMenu.Placement = PlacementMode.Bottom;
+        TitleBarContextMenu.IsOpen = true;
+    }
+
+    private void TitleBarContextMenu_Closed(object sender, RoutedEventArgs e)
+    {
+        // Restore default placement so right clicking the title bar opens at the mouse again.
+        TitleBarContextMenu.ClearValue(ContextMenu.PlacementTargetProperty);
+        TitleBarContextMenu.ClearValue(ContextMenu.PlacementProperty);
+    }
+
     private void CloseButton_Click(object sender, RoutedEventArgs e)
+        => CloseNote();
+
+    /// <summary>
+    /// Closes the window and marks the note as closed, so it isn't restored on next start up.
+    /// </summary>
+    public void CloseNote()
     {
         _viewModel.Note.IsOpen = false;
         Close();
@@ -218,6 +273,22 @@ public partial class NoteWindow : Window
     private void SettingsMenuItem_Click(object sender, RoutedEventArgs e)
     {
         _messengerService.Publish(new OpenSettingsWindowMessage(this));
+    }
+
+    private async void DeleteMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        MessageBoxResult result = MessageBox.Show(
+            this,
+            "Delete this note? This can't be undone.",
+            "Delete note",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning
+        );
+        if (result != MessageBoxResult.Yes)
+            return;
+
+        await _viewModel.DeleteNote();
+        Close();
     }
 
     #endregion

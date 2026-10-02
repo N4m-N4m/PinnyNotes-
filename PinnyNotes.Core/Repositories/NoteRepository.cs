@@ -26,7 +26,10 @@ public class NoteRepository(DatabaseConfiguration databaseConfiguration) : BaseR
             ThemeColourScheme   TEXT,
 
             IsPinned            INTEGER,
-            IsOpen              INTEGER
+            IsOpen              INTEGER,
+
+            CreatedAt           INTEGER,
+            ModifiedAt          INTEGER
         )
     ";
 
@@ -53,7 +56,10 @@ public class NoteRepository(DatabaseConfiguration databaseConfiguration) : BaseR
                     ThemeColourScheme,
 
                     IsPinned,
-                    IsOpen
+                    IsOpen,
+
+                    CreatedAt,
+                    ModifiedAt
                 )
                 VALUES
                 (
@@ -70,7 +76,10 @@ public class NoteRepository(DatabaseConfiguration databaseConfiguration) : BaseR
                     @themeColourScheme,
 
                     @isPinned,
-                    @isOpen
+                    @isOpen,
+
+                    @createdAt,
+                    @modifiedAt
                 );
             ",
             parameters: [
@@ -87,7 +96,10 @@ public class NoteRepository(DatabaseConfiguration databaseConfiguration) : BaseR
                 new("@themeColourScheme", note.ThemeColourScheme),
 
                 new("@isPinned", note.IsPinned),
-                new("@isOpen", note.IsOpen)
+                new("@isOpen", note.IsOpen),
+
+                new("@createdAt", note.CreatedAt),
+                new("@modifiedAt", note.ModifiedAt)
             ]
         );
 
@@ -186,7 +198,9 @@ public class NoteRepository(DatabaseConfiguration databaseConfiguration) : BaseR
                     ThemeColourScheme = @themeColourScheme,
 
                     IsPinned = @isPinned,
-                    IsOpen = @isOpen
+                    IsOpen = @isOpen,
+
+                    ModifiedAt = @modifiedAt
                 WHERE Id = @id;
             ",
             parameters: [
@@ -204,6 +218,8 @@ public class NoteRepository(DatabaseConfiguration databaseConfiguration) : BaseR
 
                 new("@isPinned", note.IsPinned),
                 new("@isOpen", note.IsOpen),
+
+                new("@modifiedAt", note.ModifiedAt),
 
                 new("@id", note.Id)
             ]
@@ -248,7 +264,10 @@ public class NoteRepository(DatabaseConfiguration databaseConfiguration) : BaseR
             GetString(reader, "ThemeColourScheme"),
 
             GetBool(reader, "IsPinned"),
-            GetBool(reader, "IsOpen")
+            GetBool(reader, "IsOpen"),
+
+            GetLong(reader, "CreatedAt"),
+            GetLong(reader, "ModifiedAt")
         );
 
         return noteDto;
