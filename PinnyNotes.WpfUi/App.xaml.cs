@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System.ComponentModel;
 using System.Windows;
 
 using PinnyNotes.Core;
@@ -34,8 +33,6 @@ public partial class App : Application
 
     private EventWaitHandle _eventWaitHandle = null!;
 
-    private ApplicationSettingsModel _applicationSettings = null!;
-
     protected override async void OnStartup(StartupEventArgs e)
     {
         // _mutex is required to keep it in memory, using _ = new Mutex() will not work as garbage collector will dispose of it eventually.
@@ -60,8 +57,6 @@ public partial class App : Application
 
         _settingsService = Services.GetRequiredService<SettingsService>();
         await _settingsService.Load();
-        _applicationSettings = _settingsService.ApplicationSettings;
-        _applicationSettings.PropertyChanged += OnApplicationSettingsChanged;
 
         _appMetadataService = Services.GetRequiredService<AppMetadataService>();
         await _appMetadataService.Load();
@@ -87,9 +82,9 @@ public partial class App : Application
 
         thread.Start();
 
+        // ShutdownMode is left as the default OnLastWindowClose, so like Sticky Notes the app exits
+        // once the last note (or other window) is closed, even when the tray icon is enabled.
         messengerService.Publish(new ApplicationActionMessage(ApplicationAction.Start));
-
-        ShutdownMode = (_applicationSettings.ShowNotifyIcon) ? ShutdownMode.OnExplicitShutdown : ShutdownMode.OnLastWindowClose;
 
         if (_settingsService.ApplicationSettings.CheckForUpdates)
         {
@@ -141,11 +136,5 @@ public partial class App : Application
     {
         if (message.Action == ApplicationAction.Close)
             Shutdown();
-    }
-
-    private void OnApplicationSettingsChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(ApplicationSettingsModel.ShowNotifyIcon))
-            ShutdownMode = (_applicationSettings.ShowNotifyIcon) ? ShutdownMode.OnExplicitShutdown : ShutdownMode.OnLastWindowClose;
     }
 }

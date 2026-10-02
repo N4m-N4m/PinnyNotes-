@@ -21,10 +21,12 @@
 - Modernised design, rounded note corners and Fluent icon buttons.
 - Management window redesigned as notes list.
 - Note "Save" menu item renamed to "Export as .txt…".
+- App now exits when the last window is closed, even with the tray icon enabled.
 
 ### Fixed
 - Notes staying on top of other windows when not pinned.
 - Notes closed from the management window re-opening on next start up.
+- Crash when closing an empty note other than with its close button (e.g. Alt+F4).
 
 
 ## v1.16.0 - 23/02/2026

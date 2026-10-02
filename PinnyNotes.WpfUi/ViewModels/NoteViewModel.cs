@@ -138,6 +138,9 @@ public class NoteViewModel : BaseViewModel
         if (string.IsNullOrEmpty(Note.Content))
         {
             // Delete note if empty, TO DO: Add setting for this behaviour
+            // Flag as deleted first, the window can still be deactivated while closing which would
+            // otherwise try to save the deleted note and throw.
+            _isDeleted = true;
             await _noteRepository.Delete(Note.Id);
             MessengerService.Publish<NoteActionMessage>(new(NoteAction.Deleted, Note.ToDto()));
             return false;
