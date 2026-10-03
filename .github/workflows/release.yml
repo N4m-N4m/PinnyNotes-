@@ -2,6 +2,9 @@ name: Release
 
 # Push a tag like v1.18.0 to build every artifact and publish a GitHub release.
 # Running it manually (Actions > Release > Run workflow) only builds and uploads the artifacts.
+#
+# Code signing (SignPath Foundation, see .signpath/README.md) switches on automatically once the
+# SIGNPATH_API_TOKEN secret and SIGNPATH_ORGANIZATION_ID variable are set. Until then releases are unsigned.
 on:
   push:
     tags: ['v*']
@@ -9,10 +12,13 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      SIGNING_ENABLED: ${{ secrets.SIGNPATH_API_TOKEN != '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -34,6 +40,42 @@ jobs:
       - name: Build artifacts
         shell: pwsh
         run: ./build/publish.ps1 -Version ${{ steps.version.outputs.version }}
+
+      - name: Upload unsigned artifacts
+        id: unsigned
+        uses: actions/upload-artifact@v4
+        with:
+          name: PinnyNotes-${{ steps.version.outputs.version }}-unsigned
+          path: |
+            dist/*.exe
+            dist/*.zip
+            dist/*.msi
+
+      - name: Sign with SignPath
+        if: env.SIGNING_ENABLED == 'true'
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG || 'PinnyNotes' }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG || 'release-signing' }}
+          github-artifact-id: ${{ steps.unsigned.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: signed
+
+      - name: Use signed artifacts
+        if: env.SIGNING_ENABLED == 'true'
+        shell: pwsh
+        run: |
+          Remove-Item dist -Recurse -Force
+          Move-Item signed dist
+
+      - name: Write checksums
+        shell: pwsh
+        run: |
+          Get-ChildItem dist -File -Exclude SHA256SUMS.txt | Sort-Object Name | ForEach-Object {
+            "$((Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower())  $($_.Name)"
+          } | Set-Content dist/SHA256SUMS.txt -Encoding ascii
 
       - name: Extract release notes from CHANGELOG.md
         shell: pwsh

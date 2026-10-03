@@ -44,7 +44,7 @@ Grab whichever suits you from the [**Releases page**](https://github.com/N4m-N4m
 
 On a Windows on ARM device (e.g. Snapdragon laptops), use the `arm64` version of the same file. Every download includes the .NET runtime, so there is nothing else to install. `SHA256SUMS.txt` lists checksums for every file.
 
-> **"Windows protected your PC"?** The builds aren't code-signed yet, so SmartScreen may warn the first time you run them. Click **More info → Run anyway**.
+> **"Windows protected your PC"?** Releases are being moved to free code signing through SignPath Foundation (see [Code signing policy](#-code-signing-policy)). Until a release is signed, SmartScreen may warn the first time you run it. Click **More info → Run anyway**.
 
 > **⚠️ Linux support:** not planned. Pinny Notes is built with **WPF**, which is Windows-only. Modern Linux desktops on **Wayland** also don't let apps reliably set window positions or stay "always on top", both of which Pinny Notes depends on.
 
@@ -131,6 +131,18 @@ git push origin v1.18.0
 ```
 
 The [Release workflow](.github/workflows/release.yml) builds everything and publishes a GitHub release, using that CHANGELOG section as the release notes. Tags with a hyphen (e.g. `v1.18.0-beta.1`) are marked as pre-releases.
+
+
+## 🔏 Code signing policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+
+- **Committers and reviewers:** [N4m-N4m](https://github.com/N4m-N4m)
+- **Approvers:** [N4m-N4m](https://github.com/N4m-N4m)
+
+Only files built from this repository by the [Release workflow](.github/workflows/release.yml) on GitHub-hosted runners are signed. Every signing request is approved by hand.
+
+**Privacy:** Pinny Notes stores your notes and settings locally and does not send any information to other networked systems. The one exception is the optional update check (off by default, under Settings). When turned on, it asks the GitHub API once a week for the version number of the latest release.
 
 
 ## 🙏 Credits

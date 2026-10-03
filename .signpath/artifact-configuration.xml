@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SignPath artifact configuration for Pinny Notes releases.
+  Paste this into SignPath (Project > Artifact configurations). The GitHub artifact uploaded by
+  .github/workflows/release.yml is a zip holding the exe, portable zip and msi files for each architecture.
+  Only Pinny Notes' own binaries are signed, the bundled .NET runtime files are already signed by Microsoft.
+-->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <zip-file>
+
+    <!-- PinnyNotes-<version>-<arch>.exe -->
+    <pe-file-set>
+      <include path="PinnyNotes-*.exe" min-matches="1" max-matches="unbounded" />
+      <for-each>
+        <authenticode-sign />
+      </for-each>
+    </pe-file-set>
+
+    <!-- PinnyNotes-Portable-<version>-<arch>.zip -->
+    <zip-file-set>
+      <include path="PinnyNotes-Portable-*.zip" min-matches="1" max-matches="unbounded" />
+      <for-each>
+        <pe-file path="Pinny Notes/Pinny Notes.exe">
+          <authenticode-sign />
+        </pe-file>
+      </for-each>
+    </zip-file-set>
+
+    <!-- PinnyNotes-Setup-<version>-<arch>.msi, sign the app inside first, then the installer -->
+    <msi-file-set>
+      <include path="PinnyNotes-Setup-*.msi" min-matches="1" max-matches="unbounded" />
+      <for-each>
+        <pe-file-set>
+          <include path="**/Pinny Notes.exe" />
+          <include path="**/Pinny Notes.dll" />
+          <include path="**/PinnyNotes.Core.dll" />
+          <for-each>
+            <authenticode-sign />
+          </for-each>
+        </pe-file-set>
+        <authenticode-sign />
+      </for-each>
+    </msi-file-set>
+
+  </zip-file>
+</artifact-configuration>
