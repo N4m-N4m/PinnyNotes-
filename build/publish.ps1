@@ -36,6 +36,7 @@ $work = Join-Path $Output '_work'
 if (Test-Path $Output) { Remove-Item $Output -Recurse -Force }
 New-Item -ItemType Directory -Force $work | Out-Null
 
+# MSBuild properties must be passed quoted, pwsh 7 otherwise splits -p:Name=Value into two arguments
 function Invoke-DotNet {
     & dotnet @args
     if ($LASTEXITCODE -ne 0) { throw "dotnet $($args -join ' ') failed with exit code $LASTEXITCODE" }
@@ -49,7 +50,7 @@ foreach ($rid in $Runtimes) {
     # Single-file exe
     $singleDir = Join-Path $work "single-$arch"
     Invoke-DotNet publish $project -r $rid @common -o $singleDir `
-        -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true
+        '-p:PublishSingleFile=true' '-p:IncludeNativeLibrariesForSelfExtract=true' '-p:EnableCompressionInSingleFile=true'
     $exe = Join-Path $singleDir 'Pinny Notes.exe'
     Copy-Item $exe (Join-Path $Output "PinnyNotes-$Version-$arch.exe")
 
