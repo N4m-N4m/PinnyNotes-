@@ -1,0 +1,56 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+
+  <Package Name="Pinny Notes"
+           Manufacturer="Pinny Notes"
+           Version="$(var.Version)"
+           UpgradeCode="93ED3B31-190B-4D44-A88C-74D983B46DE6"
+           Scope="perMachine">
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Icon Id="AppIcon" SourceFile="..\PinnyNotes.WpfUi\Images\icon.ico" />
+    <Property Id="ARPPRODUCTICON" Value="AppIcon" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/N4m-N4m/PinnyNotes-" />
+    <Property Id="ARPHELPLINK" Value="https://github.com/N4m-N4m/PinnyNotes-/issues" />
+
+    <StandardDirectory Id="ProgramFiles6432Folder">
+      <Directory Id="INSTALLFOLDER" Name="Pinny Notes" />
+    </StandardDirectory>
+
+    <Feature Id="Main">
+      <ComponentGroupRef Id="AppFiles" />
+      <ComponentRef Id="StartMenuShortcut" />
+    </Feature>
+
+    <ComponentGroup Id="AppFiles" Directory="INSTALLFOLDER">
+      <Files Include="$(var.PublishDir)**" />
+    </ComponentGroup>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Component Id="StartMenuShortcut">
+        <Shortcut Id="AppShortcut"
+                  Name="Pinny Notes"
+                  Description="Sticky notes that stay on top"
+                  Target="[INSTALLFOLDER]Pinny Notes.exe"
+                  WorkingDirectory="INSTALLFOLDER"
+                  Icon="AppIcon" />
+        <RegistryValue Root="HKCU" Key="Software\Pinny Notes" Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </StandardDirectory>
+
+    <!-- Offer to launch Pinny Notes from the final page of the installer -->
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch Pinny Notes" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+    <CustomAction Id="LaunchApplication" Directory="INSTALLFOLDER" ExeCommand="&quot;[INSTALLFOLDER]Pinny Notes.exe&quot;" Return="asyncNoWait" Impersonate="yes" />
+
+    <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
+    <UI>
+      <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="LaunchApplication"
+               Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed" />
+    </UI>
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+
+  </Package>
+</Wix>

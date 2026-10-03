@@ -8,6 +8,8 @@ namespace PinnyNotes.WpfUi.Helpers;
 
 public static class VersionHelper
 {
+    private const string Repository = "N4m-N4m/PinnyNotes-";
+
     private static Version CurrentVersion
         => Assembly.GetExecutingAssembly().GetName().Version ?? new();
 
@@ -17,7 +19,7 @@ public static class VersionHelper
         {
             if (CurrentVersion < await GetLatestGitHubReleaseVersion())
                 MessageBox.Show(
-                    $"A new version of Pinny Notes is available;{Environment.NewLine}https://github.com/63BeetleSmurf/PinnyNotes/releases/latest",
+                    $"A new version of Pinny Notes is available;{Environment.NewLine}https://github.com/{Repository}/releases/latest",
                     "Update available",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information
@@ -37,7 +39,7 @@ public static class VersionHelper
 
         try
         {
-            HttpResponseMessage response = await client.GetAsync("https://api.github.com/repos/63beetlesmurf/pinnynotes/releases/latest");
+            HttpResponseMessage response = await client.GetAsync($"https://api.github.com/repos/{Repository}/releases/latest");
             if (!response.IsSuccessStatusCode)
                 return null;
 

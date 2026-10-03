@@ -1,7 +1,29 @@
 # Change Log
 
 
-## v1.17.0 - Testing
+## v1.18.0 - Testing
+
+### Added
+- Notes list and menu buttons to note title bar.
+- Delete note option to note menu.
+- Search, last modified date and open indicator to notes list.
+- Note created and modified times.
+- Delete confirmation dialog with "Don't ask me again", and setting to turn it back on.
+- Self-contained single-file `.exe`, portable `.zip` and `.msi` installer builds for x64 and ARM64, published to GitHub Releases automatically.
+
+### Changed
+- Modernised design, rounded note corners and Fluent icon buttons.
+- Management window redesigned as notes list.
+- Note "Save" menu item renamed to "Export as .txt…".
+- App now exits when the last window is closed, even with the tray icon enabled.
+- Update check now looks at this fork's releases.
+
+### Fixed
+- Notes closed from the management window re-opening on next start up.
+- Crash when closing an empty note other than with its close button (e.g. Alt+F4).
+
+
+## v1.17.0 - 10/03/2026
 
 ### Added
 - Week Number action to Date Time tool.
@@ -10,23 +32,12 @@
 - Startup and new instance behaviour settings.
 - Toolbar to management window.
 - Management menu into in note title bar context menu.
-- Notes list and menu buttons to note title bar.
-- Delete note option to note menu.
-- Search, last modified date and open indicator to notes list.
-- Note created and modified times.
-- Delete confirmation dialog with "Don't ask me again", and setting to turn it back on.
 
 ### Changed
 - Spell checking now done directly with Windows vastly improving performance.
-- Modernised design, rounded note corners and Fluent icon buttons.
-- Management window redesigned as notes list.
-- Note "Save" menu item renamed to "Export as .txt…".
-- App now exits when the last window is closed, even with the tray icon enabled.
 
 ### Fixed
 - Notes staying on top of other windows when not pinned.
-- Notes closed from the management window re-opening on next start up.
-- Crash when closing an empty note other than with its close button (e.g. Alt+F4).
 
 
 ## v1.16.0 - 23/02/2026

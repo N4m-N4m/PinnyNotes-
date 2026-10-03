@@ -1,0 +1,75 @@
+name: Release
+
+# Push a tag like v1.18.0 to build every artifact and publish a GitHub release.
+# Running it manually (Actions > Release > Run workflow) only builds and uploads the artifacts.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Resolve version
+        id: version
+        shell: pwsh
+        run: |
+          if ('${{ github.ref_type }}' -eq 'tag') {
+            $version = '${{ github.ref_name }}'.TrimStart('v')
+          } else {
+            $version = ([xml](Get-Content PinnyNotes.WpfUi/PinnyNotes.WpfUi.csproj)).Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
+          }
+          "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Build artifacts
+        shell: pwsh
+        run: ./build/publish.ps1 -Version ${{ steps.version.outputs.version }}
+
+      - name: Extract release notes from CHANGELOG.md
+        shell: pwsh
+        run: |
+          $lines = Get-Content CHANGELOG.md -Encoding utf8
+          $start = ($lines | Select-String -Pattern '^## v${{ steps.version.outputs.version }}\b' | Select-Object -First 1).LineNumber
+          $notes = @()
+          if ($start) {
+            foreach ($line in $lines[$start..($lines.Count - 1)]) {
+              if ($line -match '^## ') { break }
+              $notes += $line
+            }
+          }
+          $download = @(
+            '',
+            '### Downloads',
+            '| File | What it is |',
+            '| --- | --- |',
+            '| `PinnyNotes-Setup-<version>-x64.msi` | Installer, adds a Start menu shortcut. |',
+            '| `PinnyNotes-<version>-x64.exe` | Single exe, just download and run. Notes are saved to `%AppData%\Pinny Notes`. |',
+            '| `PinnyNotes-Portable-<version>-x64.zip` | Portable, notes are saved next to the exe. Good for USB sticks. |',
+            '',
+            'Use the `arm64` files on Windows on ARM devices. No .NET install is needed for any of them.'
+          ) -replace '<version>', '${{ steps.version.outputs.version }}'
+          ($notes + $download) -join "`n" | Set-Content release-notes.md -Encoding utf8
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PinnyNotes-${{ steps.version.outputs.version }}
+          path: dist/*
+
+      - name: Publish release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Pinny Notes v${{ steps.version.outputs.version }}
+          body_path: release-notes.md
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          files: dist/*

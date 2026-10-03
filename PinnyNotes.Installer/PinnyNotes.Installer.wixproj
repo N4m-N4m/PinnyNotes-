@@ -1,0 +1,19 @@
+<Project Sdk="WixToolset.Sdk/5.0.2">
+
+  <!--
+    Built by build/publish.ps1, which passes the self-contained publish folder in as PublishDir:
+      dotnet build PinnyNotes.Installer.wixproj -p:Platform=x64 -p:Version=1.18.0 -p:PublishDir=<publish folder>\
+  -->
+
+  <PropertyGroup>
+    <Version Condition="'$(Version)' == ''">1.0.0</Version>
+    <OutputName Condition="'$(OutputName)' == ''">PinnyNotes-Setup</OutputName>
+    <DefineConstants>Version=$(Version);PublishDir=$(PublishDir)</DefineConstants>
+    <SuppressValidation>false</SuppressValidation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
+  </ItemGroup>
+
+</Project>

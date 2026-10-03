@@ -1,94 +1,143 @@
 # Pinny Notes
 
-[![Latest Release](https://img.shields.io/github/v/release/63BeetleSmurf/PinnyNotes?style=flat-square)](https://github.com/63BeetleSmurf/PinnyNotes/releases)
+[![Latest Release](https://img.shields.io/github/v/release/N4m-N4m/PinnyNotes-?style=flat-square&include_prereleases)](https://github.com/N4m-N4m/PinnyNotes-/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/N4m-N4m/PinnyNotes-/total?style=flat-square)](https://github.com/N4m-N4m/PinnyNotes-/releases)
 [![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg?style=flat-square)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
-[![Platform](https://img.shields.io/badge/Platform-Windows-0078D6?style=flat-square&logo=windows)](https://github.com/63BeetleSmurf/PinnyNotes)
-[![Liberapay receiving](https://img.shields.io/liberapay/receives/63BeetleSmurf?style=flat-square&logo=liberapay&label=Sponsor)](https://liberapay.com/63BeetleSmurf/donate)
-[![Ko-fi](https://img.shields.io/badge/Donate-Ko--fi-29abe0?style=flat-square&logo=ko-fi)](https://ko-fi.com/63BeetleSmurf)
+[![Platform](https://img.shields.io/badge/Platform-Windows_10_|_11-0078D6?style=flat-square&logo=windows)](https://github.com/N4m-N4m/PinnyNotes-/releases/latest)
+[![.NET 10](https://img.shields.io/badge/.NET-10-512BD4?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
 
-![Pinny Notes Screenshot](assets/Screenshot.png)
+![Pinny Notes, sticky notes that stay on top](assets/keyart.png)
+
+**Pinny Notes** is a sticky note app for Windows that lets you **pin** notes so they stay on top of every other window. This fork gives it a modern, Fluent look inspired by Windows 11 Sticky Notes, with rounded notes, a searchable notes list and a cleaner title bar. It keeps all of the original's power-user text tools.
+
+<p align="center">
+  <a href="https://github.com/N4m-N4m/PinnyNotes-/releases/latest"><b>⬇️ Download the latest release</b></a>
+</p>
 
 
-## 📢 About
+## ✨ What's new in this fork
 
-**Pinny Notes** is a versatile sticky note application that lets you "pin" notes, keeping them always on top of other windows. It also offers a variety of handy tools accessible via right-click menus.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/screenshot-dark.png">
+  <img alt="Pinny Notes notes and the notes list" src="assets/screenshot-light.png">
+</picture>
+
+- **Modern note design:** rounded corners, Fluent icon buttons and a slimmer title bar with quick access to the notes list and note menu.
+- **Notes list:** a Sticky Notes style overview of every note, with search, last-modified times, colour-coded cards and an indicator for notes that are open.
+- **Safer deleting:** delete from the note menu with a Fluent confirmation dialog, including "Don't ask me again".
+- **Created and modified times** are tracked for every note.
+- **Behaves like Sticky Notes:** the app exits when the last window closes.
+- **Ready-to-run downloads:** a single `.exe`, a portable `.zip` and an `.msi` installer for both **x64** and **ARM64**, with no .NET install required.
+
+See the [CHANGELOG](CHANGELOG.md) for the full list.
+
+
+## 💾 Download & Install (Windows 10 / 11)
+
+Grab whichever suits you from the [**Releases page**](https://github.com/N4m-N4m/PinnyNotes-/releases/latest):
+
+| File | Best for |
+| --- | --- |
+| `PinnyNotes-Setup-<version>-x64.msi` | **Most people.** Installs to Program Files and adds a Start menu shortcut. |
+| `PinnyNotes-<version>-x64.exe` | **Just run it.** One file, nothing to install. Notes are saved to `%AppData%\Pinny Notes`. |
+| `PinnyNotes-Portable-<version>-x64.zip` | **USB sticks and no-trace use.** Extract and run `Pinny Notes.exe`. Notes are saved next to the exe. |
+
+On a Windows on ARM device (e.g. Snapdragon laptops), use the `arm64` version of the same file. Every download includes the .NET runtime, so there is nothing else to install. `SHA256SUMS.txt` lists checksums for every file.
+
+> **"Windows protected your PC"?** The builds aren't code-signed yet, so SmartScreen may warn the first time you run them. Click **More info → Run anyway**.
+
+> **⚠️ Linux support:** not planned. Pinny Notes is built with **WPF**, which is Windows-only. Modern Linux desktops on **Wayland** also don't let apps reliably set window positions or stay "always on top", both of which Pinny Notes depends on.
 
 
 ## 🚀 Features
 
-- **Pin / Always on Top:** Keep notes visible above all other windows.
-- **Auto Save:** Automatically saves notes.
-- **Block Minimizing:** Prevent notes from being minimized, even with the Show Desktop button.
-- **Colours:** Choose from multiple colours or have new notes cycle through them automatically.
-- **Dark Mode:** Dark theme with colour-matched accents.
-- **Transparency:** Make notes semi-transparent so content behind them can still be seen.
-- **Start Position:** Set where on the screen your notes will open.
+- **Pin / Always on Top:** keep notes visible above all other windows.
+- **Notes List:** browse, search and reopen every note, sorted by last modified.
+- **Auto Save:** notes are saved automatically.
+- **Block Minimizing:** keep notes on screen, even with the Show Desktop button.
+- **Colours:** eight colours, optionally cycled automatically for new notes.
+- **Light & Dark Mode:** a dark theme with colour-matched accents, or follow Windows.
+- **Transparency:** make notes semi-transparent so content behind them can still be seen.
+- **Start Position:** set where on the screen new notes open.
+- **Startup & New Instance Behaviour:** restore open notes, create a new note or show the notes list.
 - **Advanced Copy/Paste Actions**
-  - **Copy/Paste Trim:** Automatically trim whitespace when copying or pasting.
-  - **Middle Click Paste:** Quickly paste clipboard contents with a middle-click.
-  - **Copy on Click:** Hold Ctrl and click to copy selected text.
-  - **Auto Copy:** Automatically copy text when highlighted.
-  - **No Selection Copy Behaviour:** Choose whether to copy the current line, full note, or nothing when no text is selected.
+  - **Copy/Paste Trim:** automatically trim whitespace when copying or pasting.
+  - **Middle Click Paste:** quickly paste clipboard contents with a middle-click.
+  - **Copy on Click:** hold Ctrl and click to copy selected text.
+  - **Auto Copy:** automatically copy text when highlighted.
+  - **No Selection Copy Behaviour:** copy the current line, the full note, or nothing when no text is selected.
 - **Advanced Selection:**
-  - **Triple-click:** Select current line.
-  - **Quadruple-click:** Select the full line ignoring wrapping.
-- **Indent Text:** Indent selected text by pressing the tab key.
-- **Auto Indent:** Indent new lines to match the previous line.
-- **Ends with New Line:** Ensures notes always end with a newline.
-- **Auto Scroll:** Automatically scroll to keep the last line visible, making it easy when pasting text.
-- **Spell Checking:** Integrated spell checker.
-- **Counts Menu:** View line, word, and character counts for selected or full text.
-- **Tray Icon:** Easily bring all notes to the front or launch new notes from the system tray.
-- **Note Visibility:** Show or hide note windows from the Taskbar and Task Switcher (Alt+Tab and Win+Tab)
-- **Lock Text:** Make a note read only preventing the text from being edited until unlocked.
+  - **Triple-click:** select the current line.
+  - **Quadruple-click:** select the full line, ignoring wrapping.
+- **Indent Text:** indent selected text with the Tab key.
+- **Auto Indent:** new lines match the previous line's indentation.
+- **Ends with New Line:** notes always end with a newline.
+- **Auto Scroll:** keeps the last line visible, handy when pasting.
+- **Spell Checking:** uses the built-in Windows spell checker.
+- **Counts Menu:** line, word and character counts for the selection or the full text.
+- **Tray Icon:** bring all notes to the front or create a new note from the system tray.
+- **Note Visibility:** show or hide notes in the Taskbar and Task Switcher (Alt+Tab and Win+Tab).
+- **Lock Text:** make a note read-only until it's unlocked.
+- **Export:** save any note as a `.txt` file.
 
 
 ## 🛠️ Tools
 
-- **Base64:** Encode/decode Base64 text.
-- **Bracket:** Add/remove parentheses, square or curly brackets.
-- **Case:** Convert to lower, upper, or proper case.
-- **Colour:** Convert RGB to and from HEX values.
-- **DateTime:** Get current or convert a dat eto a sortable format or the week number of the year.
-- **Gibberish:** Generate gibberish words, sentences, paragraphs, articles, and names.
-- **GUID:** Generate GUID/UUID's.
-- **Hash:** Generate MD5, SHA1, SHA256/384/512 hashes.
-- **HTML Entities:** Encode/decode HTML entities.
-- **Indent:** Indent all lines using 2/4 spaces or tabs.
-- **Join:** Join multiple lines using commas, spaces, or tabs.
-- **JSON:** Prettify JSON data.
-- **List:** Add numbering or bullets (dash), sort lines, or remove list markers.
-- **Quote:** Add or remove single, double, or backtick quotes.
-- **Remove:** Strip whitespace, slashes, or repeated text.
-- **Slash:** Toggle or remove forward/back slashes.
-- **Split:** Split text by commas, tabs, spaces, or selected patterns.
-- **Trim:** Remove line-leading/trailing whitespace or blank lines.
-- **URL:** Encode and decode text for use in URLs.
+Right-click inside a note to transform the selected text (or the whole note):
+
+- **Base64:** encode/decode Base64 text.
+- **Bracket:** add/remove parentheses, square or curly brackets.
+- **Case:** convert to lower, upper or proper case.
+- **Colour:** convert between RGB and HEX values.
+- **DateTime:** insert the current date/time, convert a date to a sortable format, or get the week number of the year.
+- **Gibberish:** generate gibberish words, sentences, paragraphs, articles and names.
+- **GUID:** generate GUIDs/UUIDs.
+- **Hash:** generate MD5, SHA1 and SHA256/384/512 hashes.
+- **HTML Entities:** encode/decode HTML entities.
+- **Indent:** indent all lines using 2/4 spaces or tabs.
+- **Join:** join multiple lines using commas, spaces or tabs.
+- **JSON:** prettify JSON data.
+- **List:** add numbering or bullets, sort lines, or remove list markers.
+- **Quote:** add or remove single, double or backtick quotes.
+- **Remove:** strip whitespace, slashes or repeated text.
+- **Slash:** toggle or remove forward/back slashes.
+- **Split:** split text by commas, tabs, spaces or a selected pattern.
+- **Trim:** remove leading/trailing whitespace or blank lines.
+- **URL:** encode and decode text for use in URLs.
 
 
-## 💾 Installation (Windows Only)
+## 🧑‍💻 Building from Source
 
-### 🔧 Installer
+You'll need the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) on Windows.
 
-1. Go to the [Releases page](https://github.com/63BeetleSmurf/PinnyNotes/releases).
-2. Download the latest `.msi` installer and run it.
+```powershell
+# Run it
+dotnet run --project PinnyNotes.WpfUi
 
-### 👜 Portable Version
+# Build every release artifact (exe, portable zip, msi for x64 + ARM64) into .\dist
+.\build\publish.ps1
 
-1. Download the latest `.zip` file from the [Releases page](https://github.com/63BeetleSmurf/PinnyNotes/releases).
-2. Extract it and run `Pinny Notes.exe`.
+# Or just one architecture, without the installer
+.\build\publish.ps1 -Runtimes win-x64 -SkipInstaller
+```
 
-> **⚠️ Linux Support Notice**
->
-> A Linux version has been requested, but one is **not planned**. Pinny Notes is built using **WPF**, which is Windows-only. Even with a cross-platform framework, modern Linux desktops using **Wayland** do not allow applications to reliably set window positions or enforce “always on top” behaviour, both of which are core features of Pinny Notes.
+The installer is built with [WiX Toolset](https://wixtoolset.org/) 5, which is restored from NuGet automatically, so nothing extra needs installing.
+
+**Releasing:** bump `<Version>` in `PinnyNotes.WpfUi/PinnyNotes.WpfUi.csproj`, add a matching `## vX.Y.Z` section to the [CHANGELOG](CHANGELOG.md), then push a tag:
+
+```powershell
+git tag v1.18.0
+git push origin v1.18.0
+```
+
+The [Release workflow](.github/workflows/release.yml) builds everything and publishes a GitHub release, using that CHANGELOG section as the release notes. Tags with a hyphen (e.g. `v1.18.0-beta.1`) are marked as pre-releases.
 
 
-## ❤️ Support Development
+## 🙏 Credits
 
-Pinny Notes is developed in my spare time. If you find it helpful, please consider donating or sponsoring;
+Pinny Notes was created by [**63BeetleSmurf**](https://github.com/63BeetleSmurf/PinnyNotes). This fork builds on their work, so please consider supporting the original project:
 
-<noscript><a href="https://liberapay.com/63BeetleSmurf/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a></noscript>
+[![Liberapay](https://img.shields.io/liberapay/receives/63BeetleSmurf?style=flat-square&logo=liberapay&label=Liberapay)](https://liberapay.com/63BeetleSmurf/donate)
+[![Ko-fi](https://img.shields.io/badge/Donate-Ko--fi-29abe0?style=flat-square&logo=ko-fi)](https://ko-fi.com/63BeetleSmurf)
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/63BeetleSmurf)
-
-Every bit of support is appreciated 🙏
+Licensed under the [GNU General Public License v2](LICENSE.txt).
